@@ -19,16 +19,16 @@ jobs:
         with:
           fetch-depth: 0
           
-      - name: Setup Node.js 16
+      - name: Setup Node.js 18
         uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 18
           
-      - name: Install dependencies
-        run: npm install @upptime/uptime-monitor@v1.34.0
+      - name: Install Upptime
+        run: npm install @upptime/uptime-monitor
         
       - name: Run Upptime monitor
-        run: node node_modules/@upptime/uptime-monitor/dist/index.js || true
+        run: npx @upptime/uptime-monitor
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
           
@@ -42,7 +42,7 @@ jobs:
           git push origin main || true
           
       - name: Generate graphs
-        run: node node_modules/@upptime/uptime-monitor/dist/index.js graphs || true
+        run: npx @upptime/uptime-monitor graphs
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
           
@@ -52,29 +52,219 @@ jobs:
           git add -A
           git diff --staged --quiet || git commit -m "📈 Update graphs"
           git push origin main || true
-          
-      - name: Build site
-        run: node node_modules/@upptime/uptime-monitor/dist/index.js site || true
-        env:
-          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create fallback site if needed
+  build-site:
+    needs: uptime
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          
+      - name: Pull latest changes
+        run: git pull origin main
+          
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          
+      - name: Build status page
         run: |
-          if [ ! -d "site" ]; then
+          # Clone the Upptime status page template
+          git clone https://github.com/upptime/status-page.git status-page-template
+          cd status-page-template
+          
+          # Install dependencies
+          npm ci
+          
+          # Copy our config
+          cp ../.upptimerc.yml .
+          
+          # Copy history and api data if exists
+          [ -d "../history" ] && cp -r ../history .
+          [ -d "../api" ] && cp -r ../api .
+          [ -d "../graphs" ] && cp -r ../graphs .
+          
+          # Build the site
+          npm run export || npm run build
+          
+          # Move output to parent
+          mv __sapper__/export ../site 2>/dev/null || mv build ../site 2>/dev/null || mv out ../site 2>/dev/null || true
+          
+      - name: Create fallback if build failed
+        run: |
+          if [ ! -d "site" ] || [ ! -f "site/index.html" ]; then
             mkdir -p site
-            echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>NPA ECM Status</title><style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;max-width:800px;margin:50px auto;padding:20px}h1{color:#1a73e8}.status{padding:20px;background:#e8f5e9;border-radius:8px;margin:20px 0;color:#1b5e20}</style></head><body><h1>NPA ECM Status</h1><div class="status"><h2>All Systems Operational</h2><p>The NPA Electronic Correspondence Management System is running normally.</p></div><p>Last updated: <span id="time"></span></p><script>document.getElementById("time").textContent=new Date().toLocaleString()</script><hr><p><a href="http://172.16.0.46:4646">Visit NPA ECM</a></p></body></html>' > site/index.html
+            cat > site/index.html << 'HTMLEOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>NPA ECM Status</title>
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body { 
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+                min-height: 100vh;
+                color: #e2e8f0;
+              }
+              .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+              header { text-align: center; margin-bottom: 48px; }
+              h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; color: #f8fafc; }
+              .subtitle { color: #94a3b8; font-size: 1rem; }
+              .status-banner {
+                background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+                border-radius: 12px;
+                padding: 24px;
+                margin-bottom: 32px;
+                display: flex;
+                align-items: center;
+                gap: 16px;
+              }
+              .status-banner.down {
+                background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+              }
+              .status-icon { font-size: 2rem; }
+              .status-text h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 4px; }
+              .status-text p { color: rgba(255,255,255,0.8); font-size: 0.875rem; }
+              .services { display: flex; flex-direction: column; gap: 12px; }
+              .service {
+                background: rgba(30, 41, 59, 0.8);
+                border: 1px solid #334155;
+                border-radius: 10px;
+                padding: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              }
+              .service-info { display: flex; align-items: center; gap: 12px; }
+              .service-name { font-weight: 500; }
+              .badge {
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+              }
+              .badge.operational { background: #065f46; color: #6ee7b7; }
+              .badge.down { background: #7f1d1d; color: #fca5a5; }
+              .uptime-bar {
+                display: flex;
+                gap: 2px;
+                margin-top: 8px;
+              }
+              .uptime-day {
+                width: 8px;
+                height: 24px;
+                border-radius: 2px;
+                background: #065f46;
+              }
+              .uptime-day.down { background: #991b1b; }
+              .uptime-day.unknown { background: #475569; }
+              .footer {
+                text-align: center;
+                margin-top: 48px;
+                padding-top: 24px;
+                border-top: 1px solid #334155;
+                color: #64748b;
+                font-size: 0.875rem;
+              }
+              .footer a { color: #60a5fa; text-decoration: none; }
+              .last-updated { color: #64748b; font-size: 0.75rem; margin-top: 8px; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <header>
+                <h1>🏢 NPA ECM Status</h1>
+                <p class="subtitle">Electronic Correspondence Management System</p>
+              </header>
+              
+              <div class="status-banner down">
+                <span class="status-icon">⚠️</span>
+                <div class="status-text">
+                  <h2>System Status Unknown</h2>
+                  <p>Status page is being set up. Check back soon for live monitoring.</p>
+                </div>
+              </div>
+              
+              <div class="services">
+                <div class="service">
+                  <div class="service-info">
+                    <span>🖥️</span>
+                    <span class="service-name">NPA ECM Frontend</span>
+                  </div>
+                  <span class="badge down">Checking</span>
+                </div>
+                <div class="service">
+                  <div class="service-info">
+                    <span>⚡</span>
+                    <span class="service-name">NPA ECM API</span>
+                  </div>
+                  <span class="badge down">Checking</span>
+                </div>
+                <div class="service">
+                  <div class="service-info">
+                    <span>🔐</span>
+                    <span class="service-name">Authentication</span>
+                  </div>
+                  <span class="badge down">Checking</span>
+                </div>
+                <div class="service">
+                  <div class="service-info">
+                    <span>📬</span>
+                    <span class="service-name">Correspondence API</span>
+                  </div>
+                  <span class="badge down">Checking</span>
+                </div>
+                <div class="service">
+                  <div class="service-info">
+                    <span>📁</span>
+                    <span class="service-name">Document Management</span>
+                  </div>
+                  <span class="badge down">Checking</span>
+                </div>
+                <div class="service">
+                  <div class="service-info">
+                    <span>🔔</span>
+                    <span class="service-name">Notifications</span>
+                  </div>
+                  <span class="badge down">Checking</span>
+                </div>
+              </div>
+              
+              <p class="last-updated">Last updated: <span id="time"></span></p>
+              
+              <footer class="footer">
+                <p>Powered by <a href="https://upptime.js.org" target="_blank">Upptime</a></p>
+                <p style="margin-top: 8px;"><a href="http://172.16.0.46:4646" target="_blank">Visit NPA ECM →</a></p>
+              </footer>
+            </div>
+            <script>document.getElementById('time').textContent = new Date().toLocaleString();</script>
+          </body>
+          </html>
+          HTMLEOF
           fi
           
-      - name: Deploy to gh-pages branch
-        run: |
-          git config user.name "Upptime Bot"
-          git config user.email "upptime@npa-ecm.com"
-          git fetch origin gh-pages || true
-          cp -r site /tmp/site-deploy
-          git checkout gh-pages 2>/dev/null || git checkout --orphan gh-pages
-          git rm -rf . 2>/dev/null || true
-          cp -r /tmp/site-deploy/* . 2>/dev/null || true
-          git add -A
-          git diff --staged --quiet || git commit -m "Deploy status page"
-          git push origin gh-pages --force
-          git checkout main
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
