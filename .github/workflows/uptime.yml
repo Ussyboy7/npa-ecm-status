@@ -6,50 +6,13 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "*/5 * * * *"
+
 jobs:
   uptime:
     runs-on: ubuntu-latest
     permissions:
       contents: write
       issues: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      - name: Run Upptime monitor
-        run: npx @upptime/uptime-monitor
-        env:
-          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
-
-  graphs:
-    needs: uptime
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      - name: Generate graphs
-        run: npx @upptime/uptime-monitor graphs
-        env:
-          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
-
-  static-site:
-    needs: graphs
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
       pages: write
       id-token: write
     steps:
@@ -57,21 +20,42 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
-      - name: Build static site
-        run: npx @upptime/uptime-monitor site
+          
+      - name: Create package.json
+        run: |
+          echo '{"name": "upptime-monitor", "private": true}' > package.json
+          
+      - name: Install Upptime
+        run: npm install @upptime/uptime-monitor
+        
+      - name: Run Upptime
+        run: ./node_modules/.bin/uptime-monitor
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Generate graphs
+        run: ./node_modules/.bin/uptime-monitor graphs
+        env:
+          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Build site
+        run: ./node_modules/.bin/uptime-monitor site
+        env:
+          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: site/
+        if: always()
 
   deploy:
-    needs: static-site
+    needs: uptime
     runs-on: ubuntu-latest
     permissions:
       pages: write
