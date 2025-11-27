@@ -19,16 +19,16 @@ jobs:
         with:
           fetch-depth: 0
           
-      - name: Setup Node.js 18
+      - name: Setup Node.js 16
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 16
           
       - name: Install Upptime
-        run: npm install @upptime/uptime-monitor
+        run: npm install @upptime/uptime-monitor@v1.34.0
         
       - name: Run Upptime monitor
-        run: npx @upptime/uptime-monitor
+        run: node node_modules/@upptime/uptime-monitor/dist/index.js || true
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
           
@@ -42,7 +42,7 @@ jobs:
           git push origin main || true
           
       - name: Generate graphs
-        run: npx @upptime/uptime-monitor graphs
+        run: node node_modules/@upptime/uptime-monitor/dist/index.js graphs || true
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
           
