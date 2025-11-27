@@ -29,26 +29,39 @@ jobs:
       - name: Install dependencies
         run: npm install @upptime/uptime-monitor@v1.34.0
         
-      - name: Run Upptime
+      - name: Run Upptime monitor
         run: node node_modules/@upptime/uptime-monitor/dist/index.js
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
           
       - name: Pull latest changes
         run: git pull origin main || true
+        
+      - name: List files after monitor
+        run: ls -la
           
       - name: Generate graphs
         run: node node_modules/@upptime/uptime-monitor/dist/index.js graphs
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
           
       - name: Pull latest changes
         run: git pull origin main || true
+        
+      - name: List files after graphs
+        run: ls -la
           
       - name: Build site
         run: node node_modules/@upptime/uptime-monitor/dist/index.js site
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: List files after site build
+        run: |
+          ls -la
+          ls -la site/ || echo "site/ directory not found"
           
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
