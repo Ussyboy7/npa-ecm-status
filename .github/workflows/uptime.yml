@@ -1,0 +1,92 @@
+name: Uptime CI
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
+jobs:
+  uptime:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install @upptime/uptime-monitor
+        run: npm install -g @upptime/uptime-monitor
+      - name: Run Upptime monitor
+        run: upptime
+        env:
+          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+  graphs:
+    needs: uptime
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install @upptime/uptime-monitor
+        run: npm install -g @upptime/uptime-monitor
+      - name: Generate graphs
+        run: upptime graphs
+        env:
+          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+  static-site:
+    needs: graphs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install @upptime/uptime-monitor
+        run: npm install -g @upptime/uptime-monitor
+      - name: Build static site
+        run: upptime site
+        env:
+          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+
+  deploy:
+    needs: static-site
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
