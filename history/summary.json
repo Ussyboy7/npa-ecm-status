@@ -1,0 +1,122 @@
+[
+  {
+    "name": "NPA ECM Frontend",
+    "url": "http://172.16.0.46:4646",
+    "icon": "https://raw.githubusercontent.com/Ussyboy7/npa-ecm-status/main/assets/npa-logo.png",
+    "slug": "npa-ecm-frontend",
+    "status": "down",
+    "uptime": "16.64%",
+    "uptimeDay": "16.64%",
+    "uptimeWeek": "16.64%",
+    "uptimeMonth": "16.64%",
+    "uptimeYear": "16.64%",
+    "time": 0,
+    "timeDay": 0,
+    "timeWeek": 0,
+    "timeMonth": 0,
+    "timeYear": 0,
+    "dailyMinutesDown": {
+      "2025-11-27": 3
+    }
+  },
+  {
+    "name": "NPA ECM API",
+    "url": "http://172.16.0.46:4646/api/health/",
+    "icon": "https://raw.githubusercontent.com/Ussyboy7/npa-ecm-status/main/assets/api-icon.png",
+    "slug": "npa-ecm-api",
+    "status": "down",
+    "uptime": "17.82%",
+    "uptimeDay": "17.82%",
+    "uptimeWeek": "17.82%",
+    "uptimeMonth": "17.82%",
+    "uptimeYear": "17.82%",
+    "time": 0,
+    "timeDay": 0,
+    "timeWeek": 0,
+    "timeMonth": 0,
+    "timeYear": 0,
+    "dailyMinutesDown": {
+      "2025-11-27": 2
+    }
+  },
+  {
+    "name": "Authentication Service",
+    "url": "http://172.16.0.46:4646/api/accounts/auth/me/",
+    "icon": "https://icons.duckduckgo.com/ip3/172.16.0.46.ico",
+    "slug": "authentication-service",
+    "status": "down",
+    "uptime": "21.58%",
+    "uptimeDay": "21.58%",
+    "uptimeWeek": "21.58%",
+    "uptimeMonth": "21.58%",
+    "uptimeYear": "21.58%",
+    "time": 0,
+    "timeDay": 0,
+    "timeWeek": 0,
+    "timeMonth": 0,
+    "timeYear": 0,
+    "dailyMinutesDown": {
+      "2025-11-27": 2
+    }
+  },
+  {
+    "name": "Correspondence API",
+    "url": "http://172.16.0.46:4646/api/correspondence/items/",
+    "icon": "https://icons.duckduckgo.com/ip3/172.16.0.46.ico",
+    "slug": "correspondence-api",
+    "status": "down",
+    "uptime": "27.43%",
+    "uptimeDay": "27.43%",
+    "uptimeWeek": "27.43%",
+    "uptimeMonth": "27.43%",
+    "uptimeYear": "27.43%",
+    "time": 0,
+    "timeDay": 0,
+    "timeWeek": 0,
+    "timeMonth": 0,
+    "timeYear": 0,
+    "dailyMinutesDown": {
+      "2025-11-27": 1
+    }
+  },
+  {
+    "name": "Document Management",
+    "url": "http://172.16.0.46:4646/api/dms/documents/",
+    "icon": "https://icons.duckduckgo.com/ip3/172.16.0.46.ico",
+    "slug": "document-management",
+    "status": "down",
+    "uptime": "39.34%",
+    "uptimeDay": "39.34%",
+    "uptimeWeek": "39.34%",
+    "uptimeMonth": "39.34%",
+    "uptimeYear": "39.34%",
+    "time": 0,
+    "timeDay": 0,
+    "timeWeek": 0,
+    "timeMonth": 0,
+    "timeYear": 0,
+    "dailyMinutesDown": {
+      "2025-11-27": 1
+    }
+  },
+  {
+    "name": "Notifications Service",
+    "url": "http://172.16.0.46:4646/api/notifications/notifications/",
+    "icon": "https://icons.duckduckgo.com/ip3/172.16.0.46.ico",
+    "slug": "notifications-service",
+    "status": "down",
+    "uptime": "68.75%",
+    "uptimeDay": "68.75%",
+    "uptimeWeek": "68.75%",
+    "uptimeMonth": "68.75%",
+    "uptimeYear": "68.75%",
+    "time": 0,
+    "timeDay": 0,
+    "timeWeek": 0,
+    "timeMonth": 0,
+    "timeYear": 0,
+    "dailyMinutesDown": {
+      "2025-11-27": 0
+    }
+  }
+]
