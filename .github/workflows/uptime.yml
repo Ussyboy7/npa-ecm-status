@@ -26,25 +26,27 @@ jobs:
         with:
           node-version: 18
           
-      - name: Create package.json
-        run: |
-          echo '{"name": "upptime-monitor", "private": true}' > package.json
-          
-      - name: Install Upptime
-        run: npm install @upptime/uptime-monitor
+      - name: Install dependencies
+        run: npm install @upptime/uptime-monitor@v1.34.0
         
       - name: Run Upptime
-        run: ./node_modules/.bin/uptime-monitor
+        run: node node_modules/@upptime/uptime-monitor/dist/index.js
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Pull latest changes
+        run: git pull origin main || true
           
       - name: Generate graphs
-        run: ./node_modules/.bin/uptime-monitor graphs
+        run: node node_modules/@upptime/uptime-monitor/dist/index.js graphs
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
           
+      - name: Pull latest changes
+        run: git pull origin main || true
+          
       - name: Build site
-        run: ./node_modules/.bin/uptime-monitor site
+        run: node node_modules/@upptime/uptime-monitor/dist/index.js site
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
           
@@ -52,7 +54,6 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: site/
-        if: always()
 
   deploy:
     needs: uptime
