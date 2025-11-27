@@ -17,8 +17,10 @@ A complete guide to deploying a status page like [status.cursor.com](https://sta
 7. [Step 4: Configure GitHub Settings](#step-4-configure-github-settings)
 8. [Step 5: Push and Deploy](#step-5-push-and-deploy)
 9. [Customization](#customization)
-10. [Troubleshooting](#troubleshooting)
-11. [Adapting for Other Apps](#adapting-for-other-apps)
+10. [Incidents](#incidents) ← **NEW**
+11. [Notifications](#notifications) ← **NEW**
+12. [Troubleshooting](#troubleshooting)
+13. [Adapting for Other Apps](#adapting-for-other-apps)
 
 ---
 
@@ -612,6 +614,138 @@ sites:
    ```
 2. Add DNS CNAME: `status.yourapp.com` → `YOUR_USER.github.io`
 3. Configure in GitHub Pages settings
+
+---
+
+## Incidents
+
+### Automatic Incidents ✅
+
+Upptime **automatically** creates and manages incidents:
+
+```
+Service goes DOWN
+       ↓
+GitHub Issue created automatically
+"🚨 NPA ECM Frontend is down"
+       ↓
+Service comes back UP
+       ↓
+Issue closed automatically
+"✅ Resolved in 2h 15m"
+```
+
+**View incidents:** `https://github.com/YOUR_USER/your-app-status/issues`
+
+The workflow needs `issues: write` permission (already included in the workflow above).
+
+### Manual Incidents
+
+For **scheduled maintenance** or **custom announcements**:
+
+1. Go to: `https://github.com/YOUR_USER/your-app-status/issues/new`
+2. **Title:** `Scheduled Maintenance: Database Upgrade`
+3. **Add label:** `maintenance` or `incident`
+4. **Body:** Describe the maintenance window
+
+```markdown
+## Scheduled Maintenance
+
+**When:** November 28, 2025 - 2:00 AM to 4:00 AM WAT
+
+**Affected Services:**
+- Database
+- API
+
+**What's happening:**
+Database upgrade to improve performance.
+
+**Expected Impact:**
+Brief service interruption. Users may experience slow responses.
+```
+
+The incident will appear on your status page!
+
+### Incident Labels
+
+| Label | Purpose |
+|-------|---------|
+| `incident` | Unplanned outage |
+| `maintenance` | Scheduled maintenance |
+| `degraded` | Partial service issues |
+| `resolved` | Issue has been fixed |
+
+---
+
+## Notifications
+
+Get alerts when services go down. Add to `.upptimerc.yml`:
+
+### Slack Notifications
+
+```yaml
+notifications:
+  - type: slack
+    channel: alerts
+    webhookUrl: ${{ secrets.SLACK_WEBHOOK }}
+```
+
+**Setup:**
+1. Create Slack webhook: https://api.slack.com/messaging/webhooks
+2. Add secret in GitHub: `Settings → Secrets → Actions → New secret`
+   - Name: `SLACK_WEBHOOK`
+   - Value: Your webhook URL
+
+### Email Notifications
+
+```yaml
+notifications:
+  - type: email
+    address: admin@yourcompany.com
+```
+
+### SMS Notifications (via Twilio)
+
+```yaml
+notifications:
+  - type: sms
+    accountSid: ${{ secrets.TWILIO_SID }}
+    authToken: ${{ secrets.TWILIO_TOKEN }}
+    phoneNumber: "+1234567890"
+```
+
+### Microsoft Teams
+
+```yaml
+notifications:
+  - type: teams
+    webhookUrl: ${{ secrets.TEAMS_WEBHOOK }}
+```
+
+### Discord
+
+```yaml
+notifications:
+  - type: discord
+    webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+```
+
+### Multiple Notifications
+
+You can combine multiple notification channels:
+
+```yaml
+notifications:
+  - type: slack
+    channel: alerts
+    webhookUrl: ${{ secrets.SLACK_WEBHOOK }}
+    
+  - type: email
+    address: admin@yourcompany.com
+    
+  - type: email
+    address: devops@yourcompany.com
+```
 
 ---
 
