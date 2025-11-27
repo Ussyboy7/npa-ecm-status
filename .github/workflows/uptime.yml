@@ -21,10 +21,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-      - name: Install @upptime/uptime-monitor
-        run: npm install -g @upptime/uptime-monitor
       - name: Run Upptime monitor
-        run: upptime
+        run: npx @upptime/uptime-monitor
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
 
@@ -42,10 +40,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-      - name: Install @upptime/uptime-monitor
-        run: npm install -g @upptime/uptime-monitor
       - name: Generate graphs
-        run: upptime graphs
+        run: npx @upptime/uptime-monitor graphs
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
 
@@ -65,10 +61,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-      - name: Install @upptime/uptime-monitor
-        run: npm install -g @upptime/uptime-monitor
       - name: Build static site
-        run: upptime site
+        run: npx @upptime/uptime-monitor site
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Pages artifact
@@ -89,4 +83,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
