@@ -1,0 +1,79 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"  # Every 5 minutes
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: upptime/uptime-monitor@v1.25.0
+        with:
+          command: "readme"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  update-uptime:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: upptime/uptime-monitor@v1.25.0
+        with:
+          command: "update"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  response-time:
+    runs-on: ubuntu-latest
+    needs: update-uptime
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: upptime/uptime-monitor@v1.25.0
+        with:
+          command: "response-time"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  graphs:
+    runs-on: ubuntu-latest
+    needs: response-time
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: upptime/uptime-monitor@v1.25.0
+        with:
+          command: "graphs"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  static-site:
+    runs-on: ubuntu-latest
+    needs: graphs
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: upptime/uptime-monitor@v1.25.0
+        with:
+          command: "static-site"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+  deploy:
+    needs: static-site
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+

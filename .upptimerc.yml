@@ -1,0 +1,122 @@
+# NPA ECM Status Page Configuration
+# Powered by Upptime (https://upptime.js.org)
+
+# GitHub repository owner and name
+owner: Ussyboy7
+repo: npa-ecm-status
+
+# Sites to monitor
+sites:
+  - name: NPA ECM Frontend
+    url: http://172.16.0.46:4646
+    icon: https://raw.githubusercontent.com/Ussyboy7/npa-ecm-status/main/assets/npa-logo.png
+    expectedStatusCodes:
+      - 200
+      - 301
+      - 302
+
+  - name: NPA ECM API
+    url: http://172.16.0.46:4646/api/health/
+    icon: https://raw.githubusercontent.com/Ussyboy7/npa-ecm-status/main/assets/api-icon.png
+    expectedStatusCodes:
+      - 200
+
+  - name: Authentication Service
+    url: http://172.16.0.46:4646/api/accounts/auth/me/
+    expectedStatusCodes:
+      - 200
+      - 401  # 401 is expected when not logged in - means service is up
+
+  - name: Correspondence API
+    url: http://172.16.0.46:4646/api/correspondence/items/
+    expectedStatusCodes:
+      - 200
+      - 401
+
+  - name: Document Management
+    url: http://172.16.0.46:4646/api/dms/documents/
+    expectedStatusCodes:
+      - 200
+      - 401
+
+  - name: Notifications Service
+    url: http://172.16.0.46:4646/api/notifications/notifications/
+    expectedStatusCodes:
+      - 200
+      - 401
+
+# Status page configuration
+status-website:
+  # Custom domain (optional - uncomment and update when ready)
+  # cname: status.npa-ecm.com
+  
+  # Logo and branding
+  logoUrl: https://raw.githubusercontent.com/Ussyboy7/npa-ecm-status/main/assets/npa-logo.png
+  name: NPA ECM Status
+  
+  # Introduction text
+  introTitle: "**NPA ECM** Service Status"
+  introMessage: "Real-time status and uptime monitoring for the Nigerian Ports Authority Electronic Correspondence Management System. [Visit NPA ECM →](http://172.16.0.46:4646)"
+  
+  # Navbar links
+  navbar:
+    - title: Status
+      href: /
+    - title: NPA ECM
+      href: http://172.16.0.46:4646
+    - title: GitHub
+      href: https://github.com/$OWNER/$REPO
+
+  # Theme (light, dark, or auto)
+  theme: auto
+  
+  # Show powered by Upptime badge
+  showPoweredBy: true
+
+# Incidents configuration
+# When a site goes down, an issue is automatically created
+i18n:
+  activeIncidents: Active Incidents
+  allSystemsOperational: All Systems Operational
+  incidentReport: Incident Report for {0}
+  IncidentTime: Incident Time
+  overallUptime: Overall Uptime
+  overallUptimeTime: "{0} uptime over the past {1} days"
+  pastIncidents: Past Incidents
+  responseTime: Response Time
+  responseTimeMs: "{0} ms"
+  liveStatus: Live Status
+  up: Operational
+  degraded: Degraded
+  down: Major Outage
+
+# How often to check (in minutes)
+# Default is 5 minutes
+workflowSchedule:
+  graphs: "0 0 * * *"        # Update graphs daily
+  responseTime: "0 23 * * *"  # Response time daily
+  staticSite: "0 1 * * *"    # Rebuild site daily
+  summary: "0 0 * * *"       # Summary daily
+  updateTemplate: "0 0 * * *" # Template daily
+  updates: "*/5 * * * *"     # Check every 5 minutes
+  uptime: "*/5 * * * *"      # Uptime every 5 minutes
+
+# Notifications (optional - uncomment and configure as needed)
+# notifications:
+#   - type: slack
+#     channel: ecm-alerts
+#     webhookUrl: $SLACK_WEBHOOK_URL
+#   - type: email
+#     address: admin@npa.gov.ng
+
+# Number of days to display in graphs
+# Default is 90 days
+commitMessages:
+  commitAuthorName: Upptime Bot
+  commitAuthorEmail: upptime@npa-ecm.com
+  statusChange: "🚨 $SITE_NAME is $STATUS"
+  graphsUpdate: "📊 Update graphs"
+  summaryUpdate: "📊 Update summary"
+  responseTimeUpdate: "⏱ Update response time"
+  templateUpdate: "📄 Update template"
+
