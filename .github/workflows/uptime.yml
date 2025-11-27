@@ -62,57 +62,19 @@ jobs:
         run: |
           if [ ! -d "site" ]; then
             mkdir -p site
-            cat > site/index.html << 'EOF'
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NPA ECM Status</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
-        h1 { color: #1a73e8; }
-        .status { padding: 20px; background: #e8f5e9; border-radius: 8px; margin: 20px 0; }
-        .status.ok { background: #e8f5e9; color: #1b5e20; }
-    </style>
-</head>
-<body>
-    <h1>🏢 NPA ECM Status</h1>
-    <div class="status ok">
-        <h2>✅ All Systems Operational</h2>
-        <p>The NPA Electronic Correspondence Management System is running normally.</p>
-    </div>
-    <p>Last updated: <span id="time"></span></p>
-    <script>document.getElementById('time').textContent = new Date().toLocaleString();</script>
-    <hr>
-    <p><a href="http://172.16.0.46:4646">Visit NPA ECM →</a></p>
-</body>
-</html>
-EOF
+            echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>NPA ECM Status</title><style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;max-width:800px;margin:50px auto;padding:20px}h1{color:#1a73e8}.status{padding:20px;background:#e8f5e9;border-radius:8px;margin:20px 0;color:#1b5e20}</style></head><body><h1>NPA ECM Status</h1><div class="status"><h2>All Systems Operational</h2><p>The NPA Electronic Correspondence Management System is running normally.</p></div><p>Last updated: <span id="time"></span></p><script>document.getElementById("time").textContent=new Date().toLocaleString()</script><hr><p><a href="http://172.16.0.46:4646">Visit NPA ECM</a></p></body></html>' > site/index.html
           fi
           
       - name: Deploy to gh-pages branch
         run: |
           git config user.name "Upptime Bot"
           git config user.email "upptime@npa-ecm.com"
-          
-          # Create orphan gh-pages branch if it doesn't exist
           git fetch origin gh-pages || true
-          
-          # Copy site contents
           cp -r site /tmp/site-deploy
-          
-          # Switch to gh-pages branch (create if needed)
           git checkout gh-pages 2>/dev/null || git checkout --orphan gh-pages
-          
-          # Clear branch and add site files
           git rm -rf . 2>/dev/null || true
           cp -r /tmp/site-deploy/* . 2>/dev/null || true
-          
-          # Commit and push
           git add -A
-          git diff --staged --quiet || git commit -m "🚀 Deploy status page"
+          git diff --staged --quiet || git commit -m "Deploy status page"
           git push origin gh-pages --force
-          
-          # Switch back to main
           git checkout main
