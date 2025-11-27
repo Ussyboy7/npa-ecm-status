@@ -60,14 +60,14 @@ Visit: `https://ussyboy7.github.io/npa-ecm-status/`
 
 ## 📊 What Gets Monitored
 
-| Service | Endpoint | Description |
-|---------|----------|-------------|
-| NPA ECM Frontend | `http://172.16.0.46:4646` | Main web application |
-| NPA ECM API | `/api/health/` | Backend health check |
-| Authentication | `/api/accounts/auth/me/` | Login service |
-| Correspondence | `/api/correspondence/items/` | Correspondence API |
-| Document Management | `/api/dms/documents/` | DMS API |
-| Notifications | `/api/notifications/notifications/` | Notification service |
+| Service             | Endpoint                            | Description          |
+| ------------------- | ----------------------------------- | -------------------- |
+| NPA ECM Frontend    | `http://172.16.0.46:4646`           | Main web application |
+| NPA ECM API         | `/api/health/`                      | Backend health check |
+| Authentication      | `/api/accounts/auth/me/`            | Login service        |
+| Correspondence      | `/api/correspondence/items/`        | Correspondence API   |
+| Document Management | `/api/dms/documents/`               | DMS API              |
+| Notifications       | `/api/notifications/notifications/` | Notification service |
 
 ---
 
@@ -91,11 +91,13 @@ Add your email in the notifications section of `.upptimerc.yml`
 To use `status.npa-ecm.com`:
 
 1. Add a CNAME record in your DNS:
+
    ```
    status.npa-ecm.com → ussyboy7.github.io
    ```
 
 2. Uncomment the `cname` line in `.upptimerc.yml`:
+
    ```yaml
    status-website:
      cname: status.npa-ecm.com
@@ -145,4 +147,3 @@ To add/remove monitored sites:
 The Nigerian Ports Authority Electronic Correspondence Management System (NPA ECM) is a comprehensive solution for managing official correspondence, documents, and workflows within the organization.
 
 **Main Application:** [NPA ECM](http://172.16.0.46:4646)
-
