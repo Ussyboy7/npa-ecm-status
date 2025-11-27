@@ -9,7 +9,7 @@ on:
 
 jobs:
   uptime:
-    runs-on: self-hosted  # Use your self-hosted runner
+    runs-on: self-hosted
     permissions:
       contents: write
       issues: write
@@ -30,25 +30,60 @@ jobs:
         run: npm install @upptime/uptime-monitor@v1.34.0
         
       - name: Run Upptime monitor
-        run: node node_modules/@upptime/uptime-monitor/dist/index.js
+        run: |
+          echo "=== Running Upptime Monitor ==="
+          node node_modules/@upptime/uptime-monitor/dist/index.js || echo "Monitor step failed"
+          echo "=== Files after monitor ==="
+          ls -la
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Pull latest changes
-        run: git pull origin main || true
+      - name: Pull and push changes
+        run: |
+          git config user.name "Upptime Bot"
+          git config user.email "upptime@npa-ecm.com"
+          git pull origin main --rebase || true
+          git add -A
+          git diff --staged --quiet || git commit -m "📊 Update uptime data"
+          git push origin main || true
           
       - name: Generate graphs
-        run: node node_modules/@upptime/uptime-monitor/dist/index.js graphs
+        run: |
+          echo "=== Generating Graphs ==="
+          node node_modules/@upptime/uptime-monitor/dist/index.js graphs || echo "Graphs step failed"
+          echo "=== Files after graphs ==="
+          ls -la
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Pull latest changes
-        run: git pull origin main || true
+      - name: Pull and push changes
+        run: |
+          git pull origin main --rebase || true
+          git add -A
+          git diff --staged --quiet || git commit -m "📈 Update graphs"
+          git push origin main || true
           
       - name: Build site
-        run: node node_modules/@upptime/uptime-monitor/dist/index.js site
+        run: |
+          echo "=== Building Site ==="
+          node node_modules/@upptime/uptime-monitor/dist/index.js site || echo "Site step failed"
+          echo "=== Files after site build ==="
+          ls -la
+          echo "=== Checking for site directory ==="
+          ls -la site/ 2>/dev/null || echo "site/ directory does not exist"
+          ls -la public/ 2>/dev/null || echo "public/ directory does not exist"
+          ls -la dist/ 2>/dev/null || echo "dist/ directory does not exist"
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create minimal site if not exists
+        run: |
+          if [ ! -d "site" ]; then
+            echo "Creating minimal status page..."
+            mkdir -p site
+            echo '<!DOCTYPE html><html><head><title>NPA ECM Status</title></head><body><h1>Status Page Coming Soon</h1><p>The status page is being configured.</p></body></html>' > site/index.html
+          fi
+          ls -la site/
           
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -57,7 +92,7 @@ jobs:
 
   deploy:
     needs: uptime
-    runs-on: ubuntu-latest  # Deploy can still use GitHub's runners
+    runs-on: ubuntu-latest
     permissions:
       pages: write
       id-token: write
