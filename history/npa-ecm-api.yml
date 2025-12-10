@@ -1,7 +1,7 @@
 url: http://172.16.0.46:4646/api/health/
-status: down
-code: 503
-responseTime: 44
-lastUpdated: 2025-12-10T20:58:32.216Z
+status: up
+code: 200
+responseTime: 27
+lastUpdated: 2025-12-10T21:45:33.819Z
 startTime: 2025-11-27T17:02:30.452Z
 generator: Upptime <https://github.com/upptime/upptime>
