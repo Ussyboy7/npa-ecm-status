@@ -1,7 +1,7 @@
 url: http://172.16.0.46:4646/api/dms/documents/
-status: down
-code: 0
-responseTime: 0
-lastUpdated: 2026-02-14T10:31:22.839Z
+status: up
+code: 401
+responseTime: 8
+lastUpdated: 2026-02-14T10:35:47.320Z
 startTime: 2025-11-27T17:04:06.120Z
 generator: Upptime <https://github.com/upptime/upptime>
