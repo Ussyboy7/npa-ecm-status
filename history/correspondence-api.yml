@@ -1,7 +1,7 @@
 url: http://172.16.0.46:4646/api/correspondence/items/
-status: up
-code: 401
-responseTime: 8
-lastUpdated: 2026-04-11T11:59:13.499Z
+status: down
+code: 502
+responseTime: 3099
+lastUpdated: 2026-04-19T19:07:28.928Z
 startTime: 2025-11-27T17:03:34.221Z
 generator: Upptime <https://github.com/upptime/upptime>
